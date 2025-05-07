@@ -1,0 +1,10 @@
+streamlit
+openai
+python-dotenv
+qdrant_client
+pydub
+pathlib
+langfuse
+
+requests
+beautifulsoup4
