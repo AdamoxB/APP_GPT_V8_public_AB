@@ -1,11 +1,14 @@
 import json  # 0.25.0 bedzie mam potrzebny do zapisania pliku jako bazy danych
 from pathlib import Path  # 025.1
 import streamlit as st
-from openai import OpenAI
+
 from dotenv import dotenv_values, load_dotenv # do czytania z plików .env
 import os
 import requests# do pobrania kursu usd
 from my_package.usd_kurs import get_usd_to_pln
+
+from langfuse.decorators import observe
+from langfuse.openai import OpenAI
 
 # openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 
@@ -17,7 +20,7 @@ st.set_page_config(layout="wide")
 
 # Wczytaj dane z pliku .env
 env = dotenv_values(".env")
-
+load_dotenv()#wymagane w langfuse
 
 def get_openai_client():
     return OpenAI(api_key=st.session_state["openai_api_key"])
@@ -238,7 +241,7 @@ PRICING = model_pricings[MODEL]  # ŁADUJEMY CENNIK DO UŻYWANEGO MODELU
 #
 # nowa lista wiadomości memeory chatbot przyjmuje na wejściu jakieś zapytanie 
 
-
+@observe()#langfuse
 def chatbot_reply(user_prompt, memory):
     messages = [
         {
