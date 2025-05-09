@@ -4,3 +4,4 @@ db/
 .env
 .ipynb_checkpoints/
 session_state.json
+api.py
