@@ -5,7 +5,7 @@ import streamlit as st
 from dotenv import dotenv_values, load_dotenv # do czytania z plików .env
 import os
 import requests# do pobrania kursu usd
-from my_package.usd_kurs import get_usd_to_pln
+from my_package.usd_kurs import get_usd_to_pln; from my_package.api_key_loader import configure_api_key
 
 from langfuse.decorators import observe
 from langfuse.openai import OpenAI
@@ -27,134 +27,11 @@ def get_openai_client():
 
 
 
-# # Ładowanie klucza API
-# Sprawdzenie źródeł kolejno i ustawienie klucza API
 
-with st.sidebar:
-    col1, col2  = st.columns([9, 4])
-    with col1:
-        with st.expander(f"Wczytaj API_key"):
-            # col1, col2, col3  = st.columns(3)
-            tab1, tab2, tab3 = st.tabs(["Lokal", "Upload_API_KEY", "WEB"])
-            # with col1:
-            with tab1:
-                if st.button("env_w_katalogu_aplikacji_VSCODE"):
-                    st.info("env w katalogu aplikacji uruchamiany na VSCODE")
-                    if 'openai_api_key' in env:
-                        st.session_state["openai_api_key"] = env['openai_api_key']
-                    elif st.session_state.get("openai_api_key"):
-                        pass  # Klucz API już jest w sesji
-                        st.success("Klucz API został zapisany do sesji na twoim komputerze.")
-                    else:
-                        # Obsłuż brak klucza API (np. komunikat o błędzie)
-                        st.info("Nie znaleziono klucza API OpenAI. Ustaw go w pliku .env lub wpisz manualnie.")
-            with tab2:
-                # if st.button("Wczytaj plik"):
-                    
-                    uploaded_file = st.file_uploader("Wczytaj plik z kluczami API dla modułów LLM", type=None)
-                    st.info("znajduje klucz z pliku zapisanegow formie .env czyli: OPENAI_API_KEY=********")
-                    if uploaded_file is not None:
-
-                        # st.session_state["openai_api_key"] = uploaded_file.read().decode("utf-8").strip()  # Dekodujemy i usuwamy spacje/newline
-                        # st.success("Klucz API został zapisany do sesji.")
-
-                            # Odczytujemy zawartość pliku jako tekst
-                        content = uploaded_file.read().decode('utf-8')
-                        lines = content.splitlines()
-
-                        # Funkcja do wyszukiwania klucza
-                        def find_key(lines, prefix):
-                            for line in lines:
-                                if line.strip().startswith(prefix):
-                                    # Usuwamy prefix, żeby zostawić tylko klucz
-                                    return line.strip().replace(prefix, "").strip()
-                            return None
-
-                        # Szukamy klucza po "OPENAI_API_KEY="
-                        openai_key = find_key(lines, "OPENAI_API_KEY=")
-
-                        # # Szukamy klucza po "API_KEY="
-                        # api_key = find_key(lines, "API_KEY=")
-
-                        # Wyświetlamy wyniki
-                        if openai_key:
-                            st.write("Klucz OpenAI API znaleziono")
-                        else:
-                            st.write("Nie znaleziono klucza OpenAI API w pliku.")
-
-                        # if api_key:
-                        #     st.success("Klucz APIznaleziono")
-                        # else:
-                        #     st.write("Nie znaleziono klucza API w pliku.")
-                                           
-                        # Zapisywanie klucza do sesji
-                        st.session_state["openai_api_key"] = openai_key
-                      
-                        st.success("Klucz API został zapisany do sesji na twoim komputerze.")
-            with tab3:
-                if st.button("streamlit_Secrets"):
-                    if 'OPENAI_API_KEY' in st.secrets:
-                        st.session_state["openai_api_key"] = st.secrets['OPENAI_API_KEY']
-                        env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
-                    
-                    elif st.session_state.get("openai_api_key"):
-                        pass  # Klucz API już jest w sesji
-                        st.success("Klucz API już jest w sesji")
-                    else:
-                        # Obsłuż brak klucza API (np. komunikat o błędzie)
-                        st.error("Nie znaleziono klucza API OpenAI. Ustaw go w streamlit > App settings > Secrets.")
-                        st.session_state.get("openai_api_key")
-    with col2:
-        if st.button("WEB_API"):
-            if 'OPENAI_API_KEY' in st.secrets:
-                        st.session_state["openai_api_key"] = st.secrets['OPENAI_API_KEY']
-                        env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
-
-# OpenAI API key protection
-if not st.session_state.get("openai_api_key"):
-    if "OPENAI_API_KEY" in env:
-        st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
-
-    else:
-        st.info("Dodaj swój klucz API OpenAI aby móc korzystać z tej aplikacji")
-        st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")#
-        if st.session_state["openai_api_key"]:
-            st.rerun()
-
-if not st.session_state.get("openai_api_key"):
-    st.stop()
+# Konfiguracja klucza API
+configure_api_key(env)
 
 
-# # Sprawdź, czy klucz API jest wczytany
-# if 'OPENAI_API_KEY' in st.secrets:
-#     env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']#API_KEY na streamlit!!!!!!!!!!!!!!!!!
-    
-# else:
-#     # openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
-#     st.write("nie jest w secrets")
-    
-#     # st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
-#     openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
-#     st.session_state.get("openai_api_key")
-
-
-
-#     st.session_state.get("openai_api_key")
-#     if "OPENAI_API_KEY" in env:
-#         st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
-
-#     else:
-#         st.info("Dodaj swój klucz API OpenAI aby móc korzystać z tej aplikacji")
-#         st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
-#         if st.session_state["openai_api_key"]:
-#             st.rerun()
-
-# if not st.session_state.get("openai_api_key"):
-#     st.stop()
-
-    # Przechowuj klucz API w session_state
-
-   
 
 
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -429,7 +306,7 @@ def list_conversations():
 #
 load_current_conversation()  # ładowanie do session_state-a messages i role
 
-st.title(":classical_building: MóJ_GPT")  # TYTUŁ
+st.title(":classical_building: Mój Chat GPT")  # TYTUŁ
 
 #############################################################################################################################################
 
