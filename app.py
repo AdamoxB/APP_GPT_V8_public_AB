@@ -9,8 +9,8 @@ from my_package.usd_kurs import get_usd_to_pln
 from my_package.api_key_loader import configure_api_key
 from my_package.model_pricings import model_pricings
 
-from langfuse.decorators import observe
-from langfuse.openai import OpenAI
+# from langfuse.decorators import observe
+# from langfuse.openai import OpenAI
 
 # openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 
@@ -88,7 +88,7 @@ PRICING = model_pricings[MODEL]  # ŁADUJEMY CENNIK DO UŻYWANEGO MODELU
 #
 # nowa lista wiadomości memeory chatbot przyjmuje na wejściu jakieś zapytanie 
 
-@observe()#langfuse
+# @observe()#langfuse
 def chatbot_reply(user_prompt, memory):
     messages = [
         {
