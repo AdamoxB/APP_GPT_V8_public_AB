@@ -1,11 +1,11 @@
-# streamlit
+streamlit
 # streamlit==1.50.0
 # streamlit==1.32.0
-streamlit>=1.25
-# langfuse
+# streamlit>=1.25
+langfuse
 # langfuse==3.5.1
 # langfuse==0.4.3  
-langfuse==0.3.2
+# langfuse==0.3.2
 openai
 python-dotenv
 qdrant_client
