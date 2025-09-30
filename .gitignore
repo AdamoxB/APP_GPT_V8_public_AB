@@ -5,5 +5,4 @@ db/
 .env
 .ipynb_checkpoints/
 session_state.json
-codecreator.py
-codecreator.ipynb
+ignore/
