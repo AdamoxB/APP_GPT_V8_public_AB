@@ -3,6 +3,7 @@ from pathlib import Path
 import streamlit as st
 
 from dotenv import dotenv_values, load_dotenv  # for reading .env files
+from openai import OpenAI
 import os
 import requests  # for fetching USD rates
 from my_package.usd_kurs import get_usd_to_pln
@@ -15,7 +16,9 @@ st.set_page_config(layout="wide")
 
 # Load environment variables from .env
 env = dotenv_values(".env")
-load_dotenv()  # required for langfuse
+# load_dotenv()  # required for langfuse
+
+
 
 def get_openai_client():
     return OpenAI(api_key=st.session_state["openai_api_key"])
@@ -65,6 +68,44 @@ with st.sidebar:
         )
 
     PRICING = model_pricings[MODEL]  # load pricing for the selected model
+
+
+# @observe()#langfuse
+def chatbot_reply(user_prompt, memory):
+    messages = [
+        {
+            #"role": "system",
+            "role": GPTROLE,
+            "content": st.session_state["chatbot_personality"],
+        },
+    ]
+    for message in memory:
+        messages.append({"role": message["role"], "contmodel": MODEL, "content": message["content"]})
+        # messages.append({"role": message["role"], "content": message["content"]})
+    messages.append({"role": "user", "contmodel": MODEL, "content": user_prompt})
+    # messages.append({"role": "user", "content": user_prompt})
+
+    response = get_openai_client().chat.completions.create(#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        
+        model=MODEL,
+        messages=messages
+    )
+    usage = {}
+
+    if response.usage:
+        usage = {
+            "completion_tokens": response.usage.completion_tokens,
+            "prompt_tokens": response.usage.prompt_tokens,
+            "total_tokens": response.usage.total_tokens,
+        }
+
+    return {
+        # "role": "assistant",
+        "role": GPTROLE,
+        "content": response.choices[0].message.content,
+        "usage": usage,
+    }
+
 
 # ------------------------------------------------------------------
 DEFAULT_PERSONALITY = """

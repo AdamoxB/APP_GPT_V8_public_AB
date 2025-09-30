@@ -3,6 +3,7 @@ from pathlib import Path  # 025.1
 import streamlit as st
 
 from dotenv import dotenv_values, load_dotenv # do czytania z plików .env
+from openai import OpenAI
 import os
 import requests# do pobrania kursu usd
 from my_package.usd_kurs import get_usd_to_pln
@@ -22,7 +23,9 @@ st.set_page_config(layout="wide")
 
 # Wczytaj dane z pliku .env
 env = dotenv_values(".env")
-load_dotenv()#wymagane w langfuse
+# load_dotenv()#wymagane w langfuse
+
+
 
 def get_openai_client():
     return OpenAI(api_key=st.session_state["openai_api_key"])
